@@ -1,2 +1,2 @@
-# My Powershell Profile
-My powershell profile
+# My PowerShell Profile
+My PowerShell profile
