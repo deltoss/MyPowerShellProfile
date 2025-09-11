@@ -28,8 +28,8 @@ if ($vsPath) {
 
     $env:PATH += ";$devenvPath"
 
-    Write-Host "Added to PATH: $devenvPath"
-    Write-Host "Visual Studio version found: $(Split-Path (Split-Path $vsPath) -Leaf)"
+    Write-Host "Added to PATH: $devenvPath" -ForegroundColor Green
+    Write-Host "Visual Studio version found: $(Split-Path (Split-Path $vsPath) -Leaf)" -ForegroundColor Green
 } else {
-    Write-Host "No Visual Studio installation found"
+    Write-Host "No Visual Studio installation found" -ForegroundColor Yellow
 }
