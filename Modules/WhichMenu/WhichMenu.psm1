@@ -153,6 +153,12 @@ $global:Openers = @{
       Desc = "[V]SCode"
       Command = 'code "{{Selection}}"'
       CausesInvoke = $true
+    },
+    @{
+      Key = 'd'
+      Desc = "Visual Studio IDE ([d]evenv)"
+      Command = 'devenv "{{Selection}}"'
+      CausesInvoke = $true
     }
   )
 
