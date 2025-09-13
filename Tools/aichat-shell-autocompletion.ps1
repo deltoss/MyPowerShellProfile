@@ -1,15 +1,3 @@
-# See: https://github.com/sigoden/aichat/wiki/Command-Line-Guide#shell-integration
-Set-PSReadLineKeyHandler -Chord "alt+e" -ScriptBlock {
-    $_old = $null
-    [Microsoft.PowerShell.PSConsoleReadline]::GetBufferState([ref]$_old, [ref]$null)
-    if ($_old) {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('⌛')
-        $_new = (aichat -e $_old)
-        [Microsoft.PowerShell.PSConsoleReadLine]::DeleteLine()
-        [Microsoft.PowerShell.PSConsoleReadline]::Insert($_new)
-    }
-}
-
 # See: https://github.com/sigoden/aichat/wiki/Command-Line-Guide#shell-autocompletion
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
