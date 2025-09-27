@@ -1,4 +1,4 @@
-$script:LeaderKey = ';'
+$script:LeaderKey = '<C-k>'
 
 function Set-LeaderKey {
     [CmdletBinding()]
