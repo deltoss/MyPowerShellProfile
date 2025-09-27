@@ -12,7 +12,7 @@
 
     RequiredModules = @('PSReadLine')
 
-    FunctionsToExport = @('Show-WhichMenu')
+    FunctionsToExport = @('Show-WhichMenu', 'ConvertFrom-VimKeyBinding', 'Set-KeyBinding', 'Set-VimKeyBinding', 'Get-LeaderKey', 'Set-LeaderKey')
     CmdletsToExport = @()
     VariablesToExport = @()
     AliasesToExport = @()

@@ -1,3 +1,8 @@
+Import-Module "$PSScriptRoot/ConvertFrom-VimKeyBinding.psm1"
+Import-Module "$PSScriptRoot/Set-VimKeyBinding.psm1"
+Import-Module "$PSScriptRoot/Set-KeyBinding.psm1"
+Import-Module "$PSScriptRoot/LeaderKey.psm1"
+
 function Show-WhichMenu {
   param(
     [Parameter(Mandatory = $true)]
@@ -188,5 +193,3 @@ $global:Openers = @{
 }
 
 $global:Openers.All = $global:Openers.Core + $global:Openers.Editors + $global:Openers.Folders
-
-Export-ModuleMember -Function Show-WhichMenu -Variable Openers
