@@ -66,9 +66,9 @@ function Select-WorktreeWithFzf {
 function Show-Worktree {
   $chosenWorktree = Select-WorktreeWithFzf
   if ($chosenWorktree) {
-    Write-Output "Selected Worktree: $($chosenWorktree | Format-List | Out-String)"
+    Write-Host "Selected Worktree: $($chosenWorktree | Format-List | Out-String)" -ForegroundColor Green
   } else {
-    Write-Output "No worktree was selected."
+    Write-Host "No worktree was selected."
   }
 }
 
@@ -76,9 +76,9 @@ function Switch-Worktree {
   $chosenWorktree = Select-WorktreeWithFzf
   if ($chosenWorktree) {
     Set-Location -Path $chosenWorktree.Path
-    Write-Output "Switched to worktree: $($chosenWorktree.Path)"
+    Write-Host "Switched to worktree: $($chosenWorktree.Path)" -ForegroundColor Green
   } else {
-    Write-Output "No worktree was selected."
+    Write-Host "No worktree was selected." -ForegroundColor Yellow
   }
 }
 
@@ -92,7 +92,7 @@ function Create-Worktree {
   $selectedBranch = $selectedBranch -replace "^origin/", ""
 
   if (-not $selectedBranch) {
-    Write-Host "No branch was selected."
+    Write-Host "No branch was selected." -ForegroundColor Yellow
     return
   }
 
@@ -103,7 +103,7 @@ function Create-Worktree {
 
   $fullPath = Join-Path $worktreePath $relativePath
 
-  Write-Host "Creating worktree at: $fullPath"
+  Write-Host "Creating worktree at: $fullPath" -ForegroundColor
   $result = git worktree add $fullPath $selectedBranch | Out-String
 
   if ($LASTEXITCODE -eq 0) {
@@ -121,13 +121,48 @@ function Remove-Worktree {
     $currentPath = (Get-Location).Path -replace '\\', '/'
     if ($chosenWorktreePath -ne $currentPath) {
       git worktree remove $chosenWorktree.Path
-      Write-Output "Removed worktree: $($chosenWorktree.Path)"
+      Write-Host "Removed worktree: $($chosenWorktree.Path)" -ForegroundColor Green
     } else {
       Set-Location -Path (Get-Worktrees | Select-Object -First 1).Path
       git worktree remove $chosenWorktree.Path
-      Write-Output "Removed worktree and switched to main repo."
+      Write-Host "Removed worktree and switched to main repo." -ForegroundColor Green
     }
   } else {
-    Write-Output "No worktree was selected."
+    Write-Host "No worktree was selected." -ForegroundColor Yellow
   }
 }
+
+$global:WhichGWBindings = @(
+  @{
+    Key = 'c'
+    Desc = '[C]hange Current'
+    Action = {
+      Switch-Worktree
+      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+  },
+  @{
+    Key = 's'
+    Desc = '[S]how'
+    Action = {
+      Show-Worktree
+      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+  },
+  @{
+    Key = 'a'
+    Desc = '[A]dd'
+    Action = {
+      Create-Worktree
+      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+  },
+  @{
+    Key = 'd'
+    Desc = '[D]elete'
+    Action = { 
+      Remove-Worktree
+      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+  }
+)
