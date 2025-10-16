@@ -8,19 +8,22 @@ $env:YAZI_CONFIG_HOME="$env:XDG_CONFIG_HOME/yazi"
 # Based on:
 #   https://yazi-rs.github.io/docs/quick-start#shell-wrapper
 function y {
-  $cwd = Get-PathWithYazi @args
-  if (-not [String]::IsNullOrEmpty($cwd) -and $cwd -ne $PWD.Path) {
-    Set-Location -LiteralPath ([System.IO.Path]::GetFullPath($cwd))
-  }
+    $tmp = (New-TemporaryFile).FullName
+    yazi $args --cwd-file="$tmp"
+    $cwd = Get-Content -Path $tmp -Encoding UTF8
+    if (-not [String]::IsNullOrEmpty($cwd) -and $cwd -ne $PWD.Path) {
+        Set-Location -LiteralPath (Resolve-Path -LiteralPath $cwd).Path
+    }
+    Remove-Item -Path $tmp
 }
 
 function Get-PathWithYazi {
-    $tmp = [System.IO.Path]::GetTempFileName()
+    $tmp = (New-TemporaryFile).FullName
     yazi $args --cwd-file="$tmp"
     $cwd = Get-Content -Path $tmp -Encoding UTF8
     Remove-Item -Path $tmp
     if (-not [String]::IsNullOrEmpty($cwd)) {
-        return [System.IO.Path]::GetFullPath($cwd)
+        return (Resolve-Path -LiteralPath $cwd).Path
     }
     return $null
 }
