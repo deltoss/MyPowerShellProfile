@@ -88,12 +88,19 @@ function Create-Worktree {
 
   Write-Host "Selected path: $worktreePath" -ForegroundColor Green
 
-  $selectedBranch = Select-GitBranch
-  $selectedBranch = $selectedBranch -replace "^origin/", ""
-
-  if (-not $selectedBranch) {
+  $interaction = Select-GitBranch
+  if (-not $interaction) {
     Write-Host "No branch was selected." -ForegroundColor Yellow
     return
+  }
+
+  $selectedBranch = $null
+  $newBranch = $interaction.Query -and -not $interaction.Branch
+  if ($newBranch) {
+    $selectedBranch = $interaction.Query
+    Write-Host "Will create new branch $selectedBranch." -ForegroundColor Green
+  } else {
+    $selectedBranch = $interaction.Branch -replace "^origin/", ""
   }
 
   $relativePath = Read-Host -Prompt "Enter the new worktree directory name (default: $selectedBranch)"
@@ -103,8 +110,13 @@ function Create-Worktree {
 
   $fullPath = Join-Path $worktreePath $relativePath
 
-  Write-Host "Creating worktree at: $fullPath" -ForegroundColor
-  $result = git worktree add $fullPath $selectedBranch | Out-String
+  Write-Host "Creating worktree at: $fullPath" -ForegroundColor Green
+  $result = $null
+  if ($newBranch) {
+    $result = git worktree add $fullPath -b $selectedBranch | Out-String
+  } else {
+    $result = git worktree add $fullPath $selectedBranch | Out-String
+  }
 
   if ($LASTEXITCODE -eq 0) {
     Set-Location -Path $fullPath
