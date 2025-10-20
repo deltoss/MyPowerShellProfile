@@ -98,7 +98,7 @@ function Create-Worktree {
   $newBranch = $interaction.Query -and -not $interaction.Branch
   if ($newBranch) {
     $selectedBranch = $interaction.Query
-    Write-Host "Will create new branch $selectedBranch." -ForegroundColor Green
+    Write-Host "Will create new branch: $selectedBranch" -ForegroundColor Green
   } else {
     $selectedBranch = $interaction.Branch -replace "^origin/", ""
   }
