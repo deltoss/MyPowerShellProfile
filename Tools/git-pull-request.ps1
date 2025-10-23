@@ -39,7 +39,7 @@ function Get-RepositoryInformation {
 
 function Get-PullRequestUrl {
   param (
-    [string] $DestBranch = 'develop',
+    [string] $DestBranch = $null,
     [GitRepositoryInfo] $RepoInfo = $null
   )
 
@@ -48,6 +48,9 @@ function Get-PullRequestUrl {
   }
 
   $srcBranch = $RepoInfo.Branch
+  if (!$DestBranch) {
+    $DestBranch = (Select-GitBranch).Branch -replace '^origin\/', ''
+  }
 
   if ($RepoInfo.Type -eq "GitHub") {
     return "https://github.com/$($RepoInfo.Organization)/$($RepoInfo.Repository)/compare/$($srcBranch)...$($DestBranch)?expand=1"
@@ -59,7 +62,7 @@ function Get-PullRequestUrl {
 
 function Open-PullRequest {
   param (
-    [string] $DestBranch = 'develop'
+    [string] $DestBranch = $null
   )
 
   Start-Process (Get-PullRequestUrl $DestBranch)
