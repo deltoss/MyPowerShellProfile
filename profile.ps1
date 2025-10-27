@@ -24,6 +24,9 @@ $scriptDir = $PSScriptRoot
 . "$scriptDir/Menus/kill-tasks.ps1"
 . "$scriptDir/Menus/network-connections.ps1"
 . "$scriptDir/Menus/llm.ps1"
+. "$scriptDir/Menus/help-pages.ps1"
 
 Import-Module "$scriptDir/Modules/WhichMenu"
 Import-Module "$scriptDir/Modules/RandomCliTip"
+
+Get-RandomFavoriteCli
