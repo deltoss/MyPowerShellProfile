@@ -115,7 +115,7 @@ function Explain-Code-Aichat {
     }
 }
 
-$global:WhichLBindings = @(
+$global:WhichABindings = @(
   @{
     Key = 'l'
     Desc = 'AI/[L]LM'
@@ -198,6 +198,6 @@ $global:WhichLBindings = @(
   }
 )
 
-Set-PSReadLineKeyHandler -Key Ctrl+l -ScriptBlock {
-  Show-WhichMenu -Bindings $global:WhichLBindings -Title '[L]LM AI'
+Set-PSReadLineKeyHandler -Key Ctrl+a -ScriptBlock {
+  Show-WhichMenu -Bindings $global:WhichABindings -Title 'LLM [A]I'
 }
