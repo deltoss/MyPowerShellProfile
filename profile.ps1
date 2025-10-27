@@ -20,7 +20,7 @@ Get-RandomFavoriteCli
 . "$scriptDir/Tools/aichat-shell-integration.ps1"
 . "$scriptDir/Tools/aichat-shell-autocompletion.ps1"
 . "$scriptDir/Tools/atac.ps1"
-. "$scriptDir/Tools/intellishell.ps1"
+. "$scriptDir/Tools/intelli-shell.ps1"
 
 . "$scriptDir/Menus/search.ps1"
 . "$scriptDir/Menus/find.ps1"
@@ -29,5 +29,5 @@ Get-RandomFavoriteCli
 . "$scriptDir/Menus/git-pull-request.ps1"
 . "$scriptDir/Menus/kill-tasks.ps1"
 . "$scriptDir/Menus/network-connections.ps1"
-. "$scriptDir/Menus/llm.ps1"
+. "$scriptDir/Menus/ai.ps1"
 . "$scriptDir/Menus/help-pages.ps1"
