@@ -121,14 +121,6 @@ function Get-RandomFavoriteCli {
     }
 }
 
-Get-RandomFavoriteCli
-
-function Search-Tldr {
-    $selected = tldr --list | fzf --prompt="🔧 Select a CLI tool > " --height=20 --border --preview-window=wrap --preview="echo {}" --header="Use ↑↓ to navigate, Enter to select, Esc to cancel"
-
-    & tldr $selected
-}
-
 function Search-FavoriteCliTools {
     try {
         # Fetch the JSON data from the gist
@@ -183,43 +175,4 @@ function Search-FavoriteCliTools {
     }
 }
 
-$global:WhichPBindings = @(
-  @{
-    Key = 'r'
-    Desc = 'Get [R]andom Favorite CLI Tip'
-    Action = {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-RandomFavoriteCli')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    }
-  },
-  @{
-    Key = 't'
-    Desc = 'Search Favorite CLI [T]ools'
-    Action = {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Search-FavoriteCliTools')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    }
-  },
-  @{
-    Key = 'n'
-    Desc = 'Search [N]avi'
-    Action = {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('navi')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    }
-  }
-  @{
-    Key = 'T'
-    Desc = 'Search [T]ldr'
-    Action = {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Search-Tldr')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    }
-  }
-)
-
-Set-PSReadLineKeyHandler -Key Ctrl+p -ScriptBlock {
-  Show-WhichMenu -Bindings $global:WhichPBindings -Title 'Help [P]ages'
-}
-
-Export-ModuleMember -Function Get-RandomFavoriteCli,Search-Tldr,Search-FavoriteCliTools
+Export-ModuleMember -Function Get-RandomFavoriteCli,Search-FavoriteCliTools
