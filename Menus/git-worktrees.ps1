@@ -1,3 +1,17 @@
+function Get-MainRepoFolder {
+  # Get the common .git directory
+  $gitCommonDir = git rev-parse --path-format=absolute --git-common-dir
+
+  # Get the main worktree from that
+  return Split-Path $gitCommonDir -Parent
+}
+
+function Get-WorktreesFolder {
+  $worktreePath = "$(Get-MainRepoFolder).worktrees/"
+
+  Write-Host "Worktree path: $worktreePath" -ForegroundColor Green
+}
+
 function Get-Worktrees {
   $output = git worktree list --porcelain | Out-String
   $entries = $output -split '(\r?\n){2}' | Where-Object { $_.Trim() }
@@ -7,8 +21,7 @@ function Get-Worktrees {
     return @()
   }
 
-  # Get the first worktree's path (main repo)
-  $mainRepoPath = ($entries[0] -split '\r?\n')[0] -replace '^worktree ', ''
+  $mainRepoPath = Get-MainRepoFolder
   $parentPath = if (-not [string]::IsNullOrEmpty($mainRepoPath)) {
     Split-Path -Parent $mainRepoPath
   } else {
@@ -83,11 +96,7 @@ function Switch-Worktree {
 }
 
 function Create-Worktree {
-  Read-Host -Prompt "Navigate Yazi to the directory you want the worktrees to be in. Press enter to continue..."
-  $worktreePath = Get-PathWithYazi (Get-Location).Path
-
-  Write-Host "Selected path: $worktreePath" -ForegroundColor Green
-
+  $worktreePath = Get-WorktreesFolder
   $interaction = Select-GitBranch
   if (-not $interaction) {
     Write-Host "No branch was selected." -ForegroundColor Yellow
