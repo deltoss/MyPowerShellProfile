@@ -95,48 +95,26 @@ function Get-RandomFavoriteCli {
         # Fetch the JSON data from the gist
         $response = Get-CachedJsonFromUrl -Url $favoriteCliUri -CacheFilePath "$env:TEMP\FavoriteCLICheatsheet.json" -Verbose
 
-        # Randomly choose between clitools and clicommands
-        $choice = Get-Random -InputObject @("clitools", "clicommands")
+        $randomItem = $response.clitools | Get-Random
 
-        if ($choice -eq "clitools") {
-            $randomItem = $response.clitools | Get-Random
-
-            Write-Host "`n🔧 Random CLI Tool:" -ForegroundColor Cyan
-            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-            Write-Host "Name:        " -NoNewline -ForegroundColor Yellow
-            Write-Host $randomItem.name
-            Write-Host "Command:     " -NoNewline -ForegroundColor Yellow
-            Write-Host $randomItem.command -ForegroundColor Green
-            Write-Host "Description: " -NoNewline -ForegroundColor Yellow
-            Write-Host $randomItem.description
-            if ($randomItem.tags) {
-                Write-Host "Tags:        " -NoNewline -ForegroundColor Yellow
-                Write-Host ($randomItem.tags -join ", ") -ForegroundColor Magenta
-            }
-            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-            Write-Host "`n🔍 Running tldr for: $($randomItem.command)" -ForegroundColor Cyan
-            Write-Host ""
-
-            # Run tldr for the selected tool
-            tldr --quiet $randomItem.command
-        } else {
-            $randomItem = $response.clicommands | Get-Random
-
-            Write-Host "`n⚡ Random CLI Command:" -ForegroundColor Cyan
-            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-            Write-Host "Name:        " -NoNewline -ForegroundColor Yellow
-            Write-Host $randomItem.name
-            Write-Host "Command:     " -NoNewline -ForegroundColor Yellow
-            Write-Host $randomItem.command -ForegroundColor Green
-            Write-Host "Description: " -NoNewline -ForegroundColor Yellow
-            Write-Host $randomItem.description
-            if ($randomItem.tags) {
-                Write-Host "Tags:        " -NoNewline -ForegroundColor Yellow
-                Write-Host ($randomItem.tags -join ", ") -ForegroundColor Magenta
-            }
-            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-            Write-Host ""
+        Write-Host "`n🔧 Random CLI Tool:" -ForegroundColor Cyan
+        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+        Write-Host "Name:        " -NoNewline -ForegroundColor Yellow
+        Write-Host $randomItem.name
+        Write-Host "Command:     " -NoNewline -ForegroundColor Yellow
+        Write-Host $randomItem.command -ForegroundColor Green
+        Write-Host "Description: " -NoNewline -ForegroundColor Yellow
+        Write-Host $randomItem.description
+        if ($randomItem.tags) {
+            Write-Host "Tags:        " -NoNewline -ForegroundColor Yellow
+            Write-Host ($randomItem.tags -join ", ") -ForegroundColor Magenta
         }
+        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+        Write-Host "`n🔍 Running tldr for: $($randomItem.command)" -ForegroundColor Cyan
+        Write-Host ""
+
+        # Run tldr for the selected tool
+        tldr --quiet $randomItem.command
     } catch {
         Write-Error "Failed to fetch data or run tldr: $($_.Exception.Message)"
         Write-Host "Make sure you have 'tldr' installed and accessible in your PATH" -ForegroundColor Yellow
@@ -205,51 +183,6 @@ function Search-FavoriteCliTools {
     }
 }
 
-function Search-FavoriteCliCommands {
-    try {
-        # Fetch the JSON data from the gist
-        $response = Get-CachedJsonFromUrl -Url $favoriteCliUri -CacheFilePath "$env:TEMP\FavoriteCLICheatsheet.json" -Verbose
-
-        # Format CLI commands for fzf
-        $items = $response.clicommands | ForEach-Object {
-            "$($_.name) | $($_.command) | $($_.description)"
-        }
-
-        # Use fzf to select a command
-        $selected = $items | fzf --prompt="⚡ Select a CLI command > " --height=20 --border --preview-window=wrap --preview="echo {}" --header="Use ↑↓ to navigate, Enter to select, Esc to cancel"
-
-        if ($selected) {
-            # Parse the selected item
-            $parts = $selected -split " \| "
-            $name = $parts[0]
-            $command = $parts[1]
-            $description = $parts[2]
-
-            # Show command info and copy to clipboard
-            Write-Host "`n⚡ Selected CLI Command:" -ForegroundColor Cyan
-            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-            Write-Host "Name:        " -NoNewline -ForegroundColor Yellow
-            Write-Host $name
-            Write-Host "Command:     " -NoNewline -ForegroundColor Yellow
-            Write-Host $command -ForegroundColor Green
-            Write-Host "Description: " -NoNewline -ForegroundColor Yellow
-            Write-Host $description
-            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-
-            # Copy command to clipboard
-            $command | Set-Clipboard
-            Write-Host "`n📋 Command copied to clipboard!" -ForegroundColor Green
-
-        } else {
-            Write-Host "No selection made." -ForegroundColor Yellow
-        }
-
-    } catch {
-        Write-Error "Failed to fetch data or run fzf: $($_.Exception.Message)"
-        Write-Host "Make sure you have 'fzf' installed and accessible in your PATH" -ForegroundColor Yellow
-    }
-}
-
 $global:WhichPBindings = @(
   @{
     Key = 'r'
@@ -268,14 +201,6 @@ $global:WhichPBindings = @(
     }
   },
   @{
-    Key = 'c'
-    Desc = 'Search and Copy Favorite CLI [C]ommands'
-    Action = {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Search-FavoriteCliCommands')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    }
-  },
-  @{
     Key = 'T'
     Desc = 'Search [T]ldr'
     Action = {
@@ -289,4 +214,4 @@ Set-PSReadLineKeyHandler -Key Ctrl+p -ScriptBlock {
   Show-WhichMenu -Bindings $global:WhichPBindings -Title 'Help [P]ages'
 }
 
-Export-ModuleMember -Function Get-RandomFavoriteCli,Search-Tldr,Search-FavoriteCliTools,Search-FavoriteCliCommands
+Export-ModuleMember -Function Get-RandomFavoriteCli,Search-Tldr,Search-FavoriteCliTools
