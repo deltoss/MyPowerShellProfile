@@ -201,6 +201,14 @@ $global:WhichPBindings = @(
     }
   },
   @{
+    Key = 'n'
+    Desc = 'Search [N]avi'
+    Action = {
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('navi')
+        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+  }
+  @{
     Key = 'T'
     Desc = 'Search [T]ldr'
     Action = {
