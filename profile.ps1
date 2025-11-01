@@ -20,6 +20,7 @@ Get-RandomFavoriteCli
 . "$scriptDir/Tools/aichat-shell-integration.ps1"
 . "$scriptDir/Tools/aichat-shell-autocompletion.ps1"
 . "$scriptDir/Tools/atac.ps1"
+. "$scriptDir/Tools/opencode.ps1"
 . "$scriptDir/Tools/intelli-shell.ps1"
 
 . "$scriptDir/Menus/search.ps1"
