@@ -22,7 +22,7 @@ Set-EnvVarIfNotSet -Name 'EDITOR' -Value "nvim"
 #   devenv MySolution.sln /build "Debug|Any CPU"
 #   devenv MySolution.sln /rebuild "Release|x64"
 #   devenv MySolution.sln /clean
-$vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+$vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -prerelease -property installationPath
 if ($vsPath) {
     $devenvPath = Join-Path $vsPath "Common7\IDE"
 
