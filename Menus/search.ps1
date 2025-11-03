@@ -18,7 +18,7 @@ Set-Alias -Name ss -Value Search-Query
 Set-Alias -Name sq -Value Search-Query
 
 function Search-DotNetSolutions {
-    $null | fzf --bind "change:reload-sync(Start-Sleep -m 100; es -sort date-modified-descending count:100 -p *.sln {q:1} {q:2} {q:3} {q:4} {q:5} {q:6} {q:7} {q:8} {q:9})" --phony --query "" --header="Search - .NET Solutions"
+    es /a-d -r !"*Recycle.Bin*\*" !"*RECYCLE*\*" !"C:\Program*\*" *.sln | fzf --multi --header='Search - .NET Solutions (Tab to Select)' | Where-Object { Start-Process devenv -Argument """$_""" }
 }
 Set-Alias -Name sd -Value Search-DotNetSolutions
 Set-Alias -Name sn -Value Search-DotNetSolutions
@@ -79,14 +79,6 @@ $global:WhichSBindings = @(
     Key = 'n'
     Desc = '.[N]et Solutions'
     Action = { Search-DotNetSolutions }
-    Openers = @(
-      @{
-        Key = 'd'
-        Desc = "Visual Studio IDE ([d]evenv)"
-        Command = 'devenv "{{Selection}}"'
-        CausesInvoke = $true
-      }
-    )
   },
   @{
     Key = 'o'
