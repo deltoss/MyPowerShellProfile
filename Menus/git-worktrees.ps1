@@ -7,9 +7,10 @@ function Get-MainRepoFolder {
 }
 
 function Get-WorktreesFolder {
-  $worktreePath = "$(Get-MainRepoFolder).worktrees/"
+  $worktreeFolder = "$(Get-MainRepoFolder).worktrees/"
 
-  Write-Host "Worktree path: $worktreePath" -ForegroundColor Green
+  Write-Host "Worktree folder: $worktreeFolder" -ForegroundColor Green
+  return $worktreeFolder
 }
 
 function Get-Worktrees {
@@ -117,9 +118,15 @@ function Create-Worktree {
     $relativePath = $selectedBranch
   }
 
-  $fullPath = Join-Path $worktreePath $relativePath
+  if (!(Test-Path -Path $worktreePath))
+  {
+    New-Item -ItemType Directory -Path $worktreePath
+    Write-Host "Created worktree folder at: $fullPath" -ForegroundColor Green
+  }
 
+  $fullPath = Join-Path $worktreePath $relativePath
   Write-Host "Creating worktree at: $fullPath" -ForegroundColor Green
+
   $result = $null
   if ($newBranch) {
     $result = git worktree add $fullPath -b $selectedBranch | Out-String
