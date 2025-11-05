@@ -3,7 +3,7 @@
 #   git checkout (gbr)
 function Select-GitBranch {
     $interaction = git branch -a --color=always | fzf --print-query --ansi --header="Git - Branches" | ForEach-Object {
-        $_.Trim() -replace '^\*\s*', '' -replace '^remotes/', '' -replace '\x1b\[[0-9;]*m', '' -replace '\+\s+', ''
+        $_.Trim() -replace '^\*\s*', '' -replace '^remotes/', '' -replace '\x1b\[[0-9;]*m', '' -replace '\+\s+', '' -replace '\s*->.+', ''
     }
 
     if (-not $interaction) { return $null }
@@ -71,7 +71,12 @@ function Show-GitLog {
 Remove-Alias -Force -Name gl
 Set-Alias -Name gl -Value Show-GitLog
 $gitLogScript = {
-    [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Show-GitLog HEAD')
+    $branch = "HEAD"
+    $selection = Select-GitBranch
+    if ($selection) {
+        $branch = $selection.Branch
+    }
+    [Microsoft.PowerShell.PSConsoleReadLine]::Insert("Show-GitLog $branch")
 }
 
 $gitEditGitHubGistsScript = {
