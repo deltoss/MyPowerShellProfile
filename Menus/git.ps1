@@ -2,7 +2,14 @@
 # E.g:
 #   git checkout (gbr)
 function Select-GitBranch {
-    $interaction = git branch -a --color=always | fzf --print-query --ansi --header="Git - Branches" | ForEach-Object {
+    [CmdletBinding()]
+    param (
+        [Parameter(Position=0, Mandatory=$false, HelpMessage="Provide an array of additional selections")]
+        [string[]]
+        $AdditionalOptions = @()
+    )
+
+    $interaction = $additionalOptions + (git branch -a --color=always) | fzf --print-query --ansi --header="Git - Branches" | ForEach-Object {
         $_.Trim() -replace '^\*\s*', '' -replace '^remotes/', '' -replace '\x1b\[[0-9;]*m', '' -replace '\+\s+', '' -replace '\s*->.+', ''
     }
 
@@ -72,7 +79,7 @@ Remove-Alias -Force -Name gl
 Set-Alias -Name gl -Value Show-GitLog
 $gitLogScript = {
     $branch = "HEAD"
-    $selection = Select-GitBranch
+    $selection = Select-GitBranch -AdditionalOptions @("  HEAD", "  --all")
     if ($selection) {
         $branch = $selection.Branch
     }
