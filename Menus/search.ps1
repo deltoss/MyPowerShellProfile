@@ -17,6 +17,11 @@ function Search-Query {
 Set-Alias -Name ss -Value Search-Query
 Set-Alias -Name sq -Value Search-Query
 
+function Find-Files {
+  fd | fzf --tac --header="Find - In Current Directory" --preview $env:FZF_CUSTOM_PREVIEW
+}
+Set-Alias -Name ff -Value Find-Files
+
 function Search-DotNetSolutions {
   es /a-d -r !"*Recycle.Bin*\*" !"*RECYCLE*\*" !"C:\Program*\*" *.sln | fzf --multi --header='Search - .NET Solutions (Tab to Select)' | Where-Object { Start-Process devenv -Argument """$_""" }
 }
@@ -64,6 +69,21 @@ function Search-GitRepositories {
 }
 Set-Alias -Name sg -Value Search-GitRepositories
 
+function Find-GitRepositoryFiles {
+  $repoRoot = "$((git rev-parse --show-toplevel) -replace '/', '\')"
+  $repoFiles = fd "" $repoRoot
+  $coloredFiles = $repoFiles | ForEach-Object {
+    $fullPath = $_
+    $relativePath = $fullPath.Substring($repoRoot.Length).TrimStart('\')
+    $coloredRelative = "`e[36m$relativePath`e[0m"
+    $displayLine = $fullPath -replace [regex]::Escape($relativePath), $coloredRelative
+    return $displayLine
+  }
+  return $coloredFiles | fzf --tac --header="Find - In Current Repository" --ansi --preview $env:FZF_CUSTOM_PREVIEW
+}
+Set-Alias -Name fg -Value Find-GitRepoFiles
+Set-Alias -Name fr -Value Find-GitRepoFiles
+
 function Search-Recents {
   # Pipe null to disable the initial unnecessary search upon entering fzf
   # Sleep command is there to debounce the query so we don't search on every single letter typed
@@ -106,6 +126,18 @@ $global:WhichSBindings = @(
     Action = { Search-Query }
     Openers = $global:Openers.All
   },
+  @{
+    Key = 'f'
+    Desc = '[F]iles'
+    Action = { Find-Files }
+    Openers = $global:Openers.All
+  },
+  @{
+    Key = 'F'
+    Desc = '[F]iles in Current Git Repository'
+    Action = { Find-GitRepositoryFiles }
+    Openers = $global:Openers.All
+  }
   @{
     Key = 'n'
     Desc = '.[N]et Solutions'

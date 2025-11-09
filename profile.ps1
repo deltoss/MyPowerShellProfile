@@ -25,7 +25,6 @@ Get-RandomFavoriteCli
 . "$scriptDir/Tools/dotnet.ps1"
 
 . "$scriptDir/Menus/search.ps1"
-. "$scriptDir/Menus/find.ps1"
 . "$scriptDir/Menus/git.ps1"
 . "$scriptDir/Menus/git-worktrees.ps1"
 . "$scriptDir/Menus/git-pull-request.ps1"
