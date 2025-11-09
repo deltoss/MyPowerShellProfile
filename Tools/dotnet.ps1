@@ -119,3 +119,40 @@ function Open-Item {
   }
 }
 Set-Alias -Name dni -Value New-DotNetItem
+
+function Get-DotNetCommand {
+  $menuItems = @(
+    @{ Name = "Build"; Cmd = "dotnet build"; Desc = "Build the project" },
+    @{ Name = "Build (Release)"; Cmd = "dotnet build -c Release"; Desc = "Build in Release mode" },
+    @{ Name = "Rebuild"; Cmd = "dotnet clean && dotnet build"; Desc = "Clean and build" },
+    @{ Name = "Clean"; Cmd = "dotnet clean"; Desc = "Clean build outputs" },
+    @{ Name = "Restore"; Cmd = "dotnet restore"; Desc = "Restore dependencies" },
+    @{ Name = "Run"; Cmd = "dotnet run"; Desc = "Run the project" },
+    @{ Name = "Run (Release)"; Cmd = "dotnet run -c Release"; Desc = "Run in Release mode" },
+    @{ Name = "Test"; Cmd = "dotnet test"; Desc = "Run tests" },
+    @{ Name = "Watch Run"; Cmd = "dotnet watch run"; Desc = "Run with file watcher" },
+    @{ Name = "Watch Test"; Cmd = "dotnet watch test"; Desc = "Test with file watcher" }
+  )
+
+  $selection = $menuItems | ForEach-Object { "$($_.Name) : $($_.Desc)" } | fzf --prompt "🚀 DotNet Commands > "
+
+  if ($null -ne $selection) {
+    # Extract the selected command name (everything before " : ")
+    $selectedName = $selection -split ' : ' | Select-Object -First 1
+
+    return $menuItems | Where-Object { $_.Name -eq $selectedName } | Select-Object -First 1
+  }
+}
+
+function Invoke-DotNetCommand {
+  $selection = Get-DotNetCommand
+
+  if ($selection) {
+    Invoke-Expression $selection.cmd
+  } else {
+    Write-Host "Could not find any menu item with the selection: $selectedName" -ForegroundColor Red
+  }
+}
+
+Set-Alias dn Invoke-DotNetCommand
+Set-Alias dnc Invoke-DotNetCommand

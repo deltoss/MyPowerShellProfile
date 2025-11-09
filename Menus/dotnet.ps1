@@ -1,4 +1,26 @@
-$global:WhichDBindings = @(
+$global:WhichNBindings = @(
+  @{
+    Key = 'n'
+    Desc = '.[N]ET Command'
+    Action = {
+      $selection = Get-DotNetCommand
+      if ($selection) {
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($selection.cmd)
+      }
+    }
+  },
+  @{
+    Key = 'c'
+    Desc = '.NET [C]ommand'
+    Action = {
+      $selection = Get-DotNetCommand
+      if ($selection) {
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($selection.cmd)
+      }
+    }
+  },
   @{
     Key = 'i'
     Desc = 'New [I]tem'
@@ -8,15 +30,15 @@ $global:WhichDBindings = @(
     Key = 'p'
     Desc = 'New [P]roject'
     Action = {
-      $command = Get-NewDotNetProjectCommand
-      if ($command) {
+      $selection = Get-NewDotNetProjectCommand
+      if ($selection) {
         [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($command)
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($selection)
       }
     }
   }
 )
 
-Set-PSReadLineKeyHandler -Key Ctrl+d -ScriptBlock {
-  Show-WhichMenu -Bindings $global:WhichDBindings -Title '[D]otnet'
+Set-PSReadLineKeyHandler -Key Ctrl+n -ScriptBlock {
+  Show-WhichMenu -Bindings $global:WhichNBindings -Title '.[N]et'
 }
