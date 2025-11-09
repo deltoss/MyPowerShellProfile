@@ -1,6 +1,6 @@
 # [F]ind locally
 function Find-Files {
-    fd | fzf --tac --header="Find - In Current Directory" --preview $env:FZF_CUSTOM_PREVIEW
+  fd | fzf --tac --header="Find - In Current Directory" --preview $env:FZF_CUSTOM_PREVIEW
 }
 Set-Alias -Name ff -Value Find-Files
 
@@ -20,22 +20,22 @@ Set-Alias -Name fg -Value Find-GitRepoFiles
 Set-Alias -Name fr -Value Find-GitRepoFiles
 
 function Search-CodeLine {
-    $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
+  $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
 
-    return fzf --ansi --disabled --query "" `
-        --bind "start:reload-sync:$RG_PREFIX {q}" `
-        --bind "change:reload-sync:$RG_PREFIX {q}" `
-        --delimiter ":" `
-        --preview "bat --color=always {1} --highlight-line {2}" `
-        --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
-        --header "Open in Neovim"
+  return fzf --ansi --disabled --query "" `
+  --bind "start:reload-sync:$RG_PREFIX {q}" `
+  --bind "change:reload-sync:$RG_PREFIX {q}" `
+  --delimiter ":" `
+  --preview "bat --color=always {1} --highlight-line {2}" `
+  --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
+  --header "Open in Neovim"
 }
 
 $neovimCodeLineOpener = @{
   Key = 'n'
   Desc = '[N]eovim'
   Command = {
-    param($Selection)
+  param($Selection)
     Write-Host "Selection $Selection"
     if ($Selection) {
       $parts = $Selection -split ':'

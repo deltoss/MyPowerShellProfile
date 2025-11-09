@@ -2,34 +2,34 @@
 # E.g:
 #   git checkout (gbr)
 function Select-GitBranch {
-    [CmdletBinding()]
-    param (
-        [Parameter(Position=0, Mandatory=$false, HelpMessage="Provide an array of additional selections")]
-        [string[]]
-        $AdditionalOptions = @()
-    )
+  [CmdletBinding()]
+  param (
+    [Parameter(Position=0, Mandatory=$false, HelpMessage="Provide an array of additional selections")]
+    [string[]]
+    $AdditionalOptions = @()
+  )
 
-    $interaction = $additionalOptions + (git branch -a --color=always) | fzf --print-query --ansi --header="Git - Branches" | ForEach-Object {
-        $_.Trim() -replace '^\*\s*', '' -replace '^remotes/', '' -replace '\x1b\[[0-9;]*m', '' -replace '\+\s+', '' -replace '\s*->.+', ''
+  $interaction = $additionalOptions + (git branch -a --color=always) | fzf --print-query --ansi --header="Git - Branches" | ForEach-Object {
+    $_.Trim() -replace '^\*\s*', '' -replace '^remotes/', '' -replace '\x1b\[[0-9;]*m', '' -replace '\+\s+', '' -replace '\s*->.+', ''
+  }
+
+  if (-not $interaction) { return $null }
+
+  if ($interaction -is [string]) { # Only a search query, but no selection
+    return [PSCustomObject]@{
+      Query = $interaction
+      Branch = $null
     }
+  }
 
-    if (-not $interaction) { return $null }
-
-    if ($interaction -is [string]) { # Only a search query, but no selection
-        return [PSCustomObject]@{
-            Query = $interaction
-            Branch = $null
-        }
-    }
-
-    return [PSCustomObject]@{ # A query, and a selection
-        Query = $interaction[0]
-        Branch = $interaction[1]
-    }
+  return [PSCustomObject]@{ # A query, and a selection
+    Query = $interaction[0]
+    Branch = $interaction[1]
+  }
 }
 $gitBranchScript = {
-    $interaction = Select-GitBranch
-    if ($interaction -and $interaction.Branch) { [Microsoft.PowerShell.PSConsoleReadLine]::Insert($interaction.Branch) }
+  $interaction = Select-GitBranch
+  if ($interaction -and $interaction.Branch) { [Microsoft.PowerShell.PSConsoleReadLine]::Insert($interaction.Branch) }
 }
 Set-Alias -Name gb -Value Select-GitBranch
 
@@ -38,62 +38,62 @@ Set-Alias -Name gb -Value Select-GitBranch
 #   git show (gco)
 #   git cherry-pick (gco)
 function Select-GitCommit {
-    git log --all --color=always --pretty=format:"%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %s %C(blue)(%an)%C(reset) %H" --date=format:"%Y-%m-%d %I:%M %p" | fzf --ansi --header="Git - Commits" | ForEach-Object {
-        ($_ -replace '\x1b\[[0-9;]*m', '').Split(' ')[0]
-    }
+  git log --all --color=always --pretty=format:"%C(yellow)%h%C(reset) %C(green)%ad%C(reset) %s %C(blue)(%an)%C(reset) %H" --date=format:"%Y-%m-%d %I:%M %p" | fzf --ansi --header="Git - Commits" | ForEach-Object {
+    ($_ -replace '\x1b\[[0-9;]*m', '').Split(' ')[0]
+  }
 }
 Remove-Alias -Force -Name gc
 Set-Alias -Name gc -Value Select-GitCommit
 $gitCommitScript = {
-    $commit = Select-GitCommit
-    if ($commit) { [Microsoft.PowerShell.PSConsoleReadLine]::Insert($commit) }
+  $commit = Select-GitCommit
+  if ($commit) { [Microsoft.PowerShell.PSConsoleReadLine]::Insert($commit) }
 }
 
 # Git file picker (modified files)
 # E.g:
 #   git add (gfi)
 function Select-GitFile {
-    git status --porcelain | fzf --header="Git - Changed Files" | ForEach-Object { $_.Substring(3) }
+  git status --porcelain | fzf --header="Git - Changed Files" | ForEach-Object { $_.Substring(3) }
 }
 Set-Alias -Name gf -Value Select-GitFile
 
 # Git log
 function Show-GitLog {
-    param(
-        [Parameter(ValueFromRemainingArguments=$true)]
-        [string[]]$AdditionalFlags
-    )
+  param(
+    [Parameter(ValueFromRemainingArguments=$true)]
+    [string[]]$AdditionalFlags
+  )
 
-    $baseArgs = @(
-        'log',
-        '--graph',
-        '--pretty=format:%C(yellow)%h%Creset %C(green)%ad%Creset %C(bold blue)%an%Creset %C(red)%d%Creset %s %C(dim white)%b%Creset',
-        '--date=short',
-        '--color'
-    )
+  $baseArgs = @(
+    'log',
+    '--graph',
+    '--pretty=format:%C(yellow)%h%Creset %C(green)%ad%Creset %C(bold blue)%an%Creset %C(red)%d%Creset %s %C(dim white)%b%Creset',
+    '--date=short',
+    '--color'
+  )
 
-    $allArgs = $baseArgs + $AdditionalFlags
-    & git $allArgs
+  $allArgs = $baseArgs + $AdditionalFlags
+  & git $allArgs
 }
 Remove-Alias -Force -Name gl
 Set-Alias -Name gl -Value Show-GitLog
 $gitLogScript = {
-    $branch = "HEAD"
-    $selection = Select-GitBranch -AdditionalOptions @("  HEAD", "  --all")
-    if ($selection) {
-        $branch = $selection.Branch
-    }
-    [Microsoft.PowerShell.PSConsoleReadLine]::Insert("Show-GitLog $branch")
+  $branch = "HEAD"
+  $selection = Select-GitBranch -AdditionalOptions @("  HEAD", "  --all")
+  if ($selection) {
+    $branch = $selection.Branch
+  }
+  [Microsoft.PowerShell.PSConsoleReadLine]::Insert("Show-GitLog $branch")
 }
 
 $gitEditGitHubGistsScript = {
-    [Microsoft.PowerShell.PSConsoleReadLine]::Insert('gh gist edit')
-    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+  [Microsoft.PowerShell.PSConsoleReadLine]::Insert('gh gist edit')
+  [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 }
 
 $gitResolveMergeConflictScript = {
-    [Microsoft.PowerShell.PSConsoleReadLine]::Insert('git mergetool')
-    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+  [Microsoft.PowerShell.PSConsoleReadLine]::Insert('git mergetool')
+  [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 }
 
 $global:WhichGBindings = @(
@@ -101,8 +101,8 @@ $global:WhichGBindings = @(
     Key = 'g'
     Desc = 'Lazy[G]it'
     Action = {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('lazygit')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+      [Microsoft.PowerShell.PSConsoleReadLine]::Insert('lazygit')
+      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
   },
   @{
