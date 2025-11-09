@@ -22,6 +22,7 @@ Get-RandomFavoriteCli
 . "$scriptDir/Tools/atac.ps1"
 . "$scriptDir/Tools/opencode.ps1"
 . "$scriptDir/Tools/intelli-shell.ps1"
+. "$scriptDir/Tools/dotnet.ps1"
 
 . "$scriptDir/Menus/search.ps1"
 . "$scriptDir/Menus/find.ps1"
@@ -32,3 +33,4 @@ Get-RandomFavoriteCli
 . "$scriptDir/Menus/network-connections.ps1"
 . "$scriptDir/Menus/ai.ps1"
 . "$scriptDir/Menus/help-pages.ps1"
+. "$scriptDir/Menus/dotnet.ps1"
