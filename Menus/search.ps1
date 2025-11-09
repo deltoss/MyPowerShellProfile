@@ -28,6 +28,37 @@ function Search-ObsidianNotes {
 }
 Set-Alias -Name so -Value Search-ObsidianNotes
 
+function Search-CodeLine {
+  $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
+
+  return fzf --ansi --disabled --query "" `
+  --bind "start:reload-sync:$RG_PREFIX {q}" `
+  --bind "change:reload-sync:$RG_PREFIX {q}" `
+  --delimiter ":" `
+  --preview "bat --color=always {1} --highlight-line {2}" `
+  --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
+  --header "Open in Neovim"
+}
+
+$neovimCodeLineOpener = @{
+  Key = 'n'
+  Desc = '[N]eovim'
+  Command = {
+  param($Selection)
+    Write-Host "Selection $Selection"
+    if ($Selection) {
+      $parts = $Selection -split ':'
+      $file = '"' + $parts[0] + '"'
+      $line = $parts[1]
+
+      if ($file -and $line) {
+        Write-Host "File and Line: $file $line"
+        Start-Process -FilePath "nvim" -ArgumentList "+$line", $file -NoNewWindow -Wait
+      }
+    }
+  }
+}
+
 function Search-GitRepositories {
   es -r folder:^\.git$ !"*RECYCLE*\*" !"C:\Program*\*" | ForEach-Object { Split-Path $_ -Parent } | fzf --header="Search - Git Repositories" --preview $env:FZF_CUSTOM_PREVIEW
 }
@@ -88,6 +119,12 @@ $global:WhichSBindings = @(
   },
   @{
     Key = 'g'
+    Desc = '[G]rep'
+    Action = { Search-CodeLine }
+    Openers = @($neovimCodeLineOpener)
+  }
+  @{
+    Key = 'G'
     Desc = '[G]it Repositories'
     Action = { Search-GitRepositories }
     Openers = $global:Openers.All

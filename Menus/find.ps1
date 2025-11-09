@@ -19,37 +19,6 @@ function Find-GitRepositoryFiles {
 Set-Alias -Name fg -Value Find-GitRepoFiles
 Set-Alias -Name fr -Value Find-GitRepoFiles
 
-function Search-CodeLine {
-  $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
-
-  return fzf --ansi --disabled --query "" `
-  --bind "start:reload-sync:$RG_PREFIX {q}" `
-  --bind "change:reload-sync:$RG_PREFIX {q}" `
-  --delimiter ":" `
-  --preview "bat --color=always {1} --highlight-line {2}" `
-  --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
-  --header "Open in Neovim"
-}
-
-$neovimCodeLineOpener = @{
-  Key = 'n'
-  Desc = '[N]eovim'
-  Command = {
-  param($Selection)
-    Write-Host "Selection $Selection"
-    if ($Selection) {
-      $parts = $Selection -split ':'
-      $file = '"' + $parts[0] + '"'
-      $line = $parts[1]
-
-      if ($file -and $line) {
-        Write-Host "File and Line: $file $line"
-        Start-Process -FilePath "nvim" -ArgumentList "+$line", $file -NoNewWindow -Wait
-      }
-    }
-  }
-}
-
 $global:WhichFBindings = @(
   @{
     Key = 'f'
@@ -62,12 +31,6 @@ $global:WhichFBindings = @(
     Desc = 'Files in [G]it Repository'
     Action = { Find-GitRepositoryFiles }
     Openers = $global:Openers.All
-  },
-  @{
-    Key = 'c'
-    Desc = 'File [C]ontent'
-    Action = { Search-CodeLine }
-    Openers = @($neovimCodeLineOpener)
   }
 )
 
