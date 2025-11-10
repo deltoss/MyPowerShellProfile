@@ -39,12 +39,12 @@ function Find-Files {
     $Query
   )
 
+  $queryString = ""
   if ($Query) {
     $queryString = $Query -join ' '
-    return fd | fzf --tac --header="Find - In Current Directory" --preview $env:FZF_CUSTOM_PREVIEW --query $queryString
   }
 
-  return fd | fzf --tac --header="Find - In Current Directory" --preview $env:FZF_CUSTOM_PREVIEW
+  return fd | fzf --tac --header="Find - In Current Directory" --preview $env:FZF_CUSTOM_PREVIEW --query $queryString
 }
 Set-Alias -Name f -Value Find-Files
 Set-Alias -Name ff -Value Find-Files
