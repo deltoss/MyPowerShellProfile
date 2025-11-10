@@ -81,7 +81,7 @@ function Unmount-NetworkDrives {
 }
 Set-Alias -Name cu -Value Unmount-NetworkDrives
 
-$global:WhichWBindings = @(
+$global:WhichTBindings = @(
   @{
     Key = 's'
     Desc = '[S]SH'
@@ -107,6 +107,6 @@ $global:WhichWBindings = @(
   }
 )
 
-Set-PSReadLineKeyHandler -Key Ctrl+w -ScriptBlock {
-  Show-WhichMenu -Bindings $global:WhichWBindings -Title 'Net[w]ork Connections'
+Set-PSReadLineKeyHandler -Key Ctrl+t -ScriptBlock {
+  Show-WhichMenu -Bindings $global:WhichTBindings -Title 'Ne[t]work Connections'
 }
