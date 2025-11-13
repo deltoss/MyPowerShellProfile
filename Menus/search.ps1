@@ -17,7 +17,7 @@ function Search-Query {
     $Query
   )
 
-  $esTemplate = "es -sort date-modified-descending count:100 {q:1} {q:2} {q:3} {q:4} {q:5} {q:6} {q:7} {q:8} {q:9}"
+  $esTemplate = "es -sort date-modified-descending count:100 -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9}"
   if ($Query) {
     $queryString = $Query -join ' '
     return fzf --bind "start:reload:$esTemplate" --bind "change:reload-sync(Start-Sleep -m 100; $esTemplate)" --query $queryString --header="Search - Query"
@@ -50,7 +50,7 @@ Set-Alias -Name f -Value Find-Files
 Set-Alias -Name ff -Value Find-Files
 
 function Search-DotNetSolutions {
-  es /a-d -r !"*Recycle.Bin*\*" !"*RECYCLE*\*" !"C:\Program*\*" *.sln | fzf --multi --header='Search - .NET Solutions (Tab to Select)' | Where-Object { Start-Process devenv -Argument """$_""" }
+  es /a-d -p -r !'.*\`$Recycle.Bin' -r !'RECYCLE' -r !'^C:\\Program' -r !'C:\\Windows' -r .sln$ | fzf --multi --header='Search - .NET Solutions (Tab to Select)' | Where-Object { Start-Process devenv -Argument """$_""" }
 }
 Set-Alias -Name sd -Value Search-DotNetSolutions
 Set-Alias -Name sn -Value Search-DotNetSolutions
@@ -92,7 +92,7 @@ $neovimCodeLineOpener = @{
 }
 
 function Search-GitRepositories {
-  es -r folder:^\.git$ !"*RECYCLE*\*" !"C:\Program*\*" | ForEach-Object { Split-Path $_ -Parent } | fzf --header="Search - Git Repositories" --preview $env:FZF_CUSTOM_PREVIEW
+  es !'.*\`$Recycle.Bin' -r !'RECYCLE' -r !'^C:\\Program' -r !'C:\\Windows' -r folder:^\.git$ | ForEach-Object { Split-Path $_ -Parent } | fzf --header="Search - Git Repositories" --preview $env:FZF_CUSTOM_PREVIEW
 }
 Set-Alias -Name sg -Value Search-GitRepositories
 
