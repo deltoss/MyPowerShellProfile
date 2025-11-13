@@ -1,5 +1,6 @@
 # [S]earching globally
-function Search-ZoxideDirectories {
+function Search-ZoxideDirectories
+{
   zoxide query --interactive
 }
 # Usage example:
@@ -9,7 +10,8 @@ function Search-ZoxideDirectories {
 Set-Alias -Name sz -Value Search-ZoxideDirectories
 Set-Alias -Name zq -Value Search-ZoxideDirectories
 
-function Search-Query {
+function Search-Query
+{
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory=$false, Position=0, ValueFromRemainingArguments=$true)]
@@ -18,7 +20,8 @@ function Search-Query {
   )
 
   $esTemplate = "es -sort date-modified-descending count:100 -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9}"
-  if ($Query) {
+  if ($Query)
+  {
     $queryString = $Query -join ' '
     return fzf --bind "start:reload:$esTemplate" --bind "change:reload-sync(Start-Sleep -m 100; $esTemplate)" --query $queryString --header="Search - Query"
   }
@@ -31,7 +34,8 @@ Set-Alias -Name s -Value Search-Query
 Set-Alias -Name ss -Value Search-Query
 Set-Alias -Name sq -Value Search-Query
 
-function Find-Files {
+function Find-Files
+{
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory=$false, Position=0, ValueFromRemainingArguments=$true)]
@@ -40,7 +44,8 @@ function Find-Files {
   )
 
   $queryString = ""
-  if ($Query) {
+  if ($Query)
+  {
     $queryString = $Query -join ' '
   }
 
@@ -49,41 +54,46 @@ function Find-Files {
 Set-Alias -Name f -Value Find-Files
 Set-Alias -Name ff -Value Find-Files
 
-function Search-DotNetSolutions {
-  es /a-d -p -r !'.*\`$Recycle.Bin' -r !'RECYCLE' -r !'^C:\\Program' -r !'C:\\Windows' -r .sln$ | fzf --multi --header='Search - .NET Solutions (Tab to Select)' | Where-Object { Start-Process devenv -Argument """$_""" }
+function Search-DotNetSolutions
+{
+  es /a-d -p -r !'\\\$Recycle.Bin' -r !'^C:\\Program' -r !'C:\\Windows' -r .sln$ | fzf --multi --header='Search - .NET Solutions (Tab to Select)' | Where-Object { Start-Process devenv -Argument """$_""" }
 }
 Set-Alias -Name sd -Value Search-DotNetSolutions
 Set-Alias -Name sn -Value Search-DotNetSolutions
 
-function Search-ObsidianNotes {
+function Search-ObsidianNotes
+{
   fd . "$env:USERPROFILE\Documents\Note Taking" | fzf --header="Search - Obsidian Notes" --preview $env:FZF_CUSTOM_PREVIEW
 }
 Set-Alias -Name so -Value Search-ObsidianNotes
 
-function Search-CodeLine {
+function Search-CodeLine
+{
   $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
 
   return fzf --ansi --disabled --query "" `
-  --bind "start:reload-sync:$RG_PREFIX {q}" `
-  --bind "change:reload-sync:$RG_PREFIX {q}" `
-  --delimiter ":" `
-  --preview "bat --color=always {1} --highlight-line {2}" `
-  --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
-  --header "Open in Neovim"
+    --bind "start:reload-sync:$RG_PREFIX {q}" `
+    --bind "change:reload-sync:$RG_PREFIX {q}" `
+    --delimiter ":" `
+    --preview "bat --color=always {1} --highlight-line {2}" `
+    --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
+    --header "Open in Neovim"
 }
 
 $neovimCodeLineOpener = @{
   Key = 'n'
   Desc = '[N]eovim'
   Command = {
-  param($Selection)
+    param($Selection)
     Write-Host "Selection $Selection"
-    if ($Selection) {
+    if ($Selection)
+    {
       $parts = $Selection -split ':'
       $file = '"' + $parts[0] + '"'
       $line = $parts[1]
 
-      if ($file -and $line) {
+      if ($file -and $line)
+      {
         Write-Host "File and Line: $file $line"
         Start-Process -FilePath "nvim" -ArgumentList "+$line", $file -NoNewWindow -Wait
       }
@@ -91,12 +101,14 @@ $neovimCodeLineOpener = @{
   }
 }
 
-function Search-GitRepositories {
+function Search-GitRepositories
+{
   es !'.*\`$Recycle.Bin' -r !'RECYCLE' -r !'^C:\\Program' -r !'C:\\Windows' -r folder:^\.git$ | ForEach-Object { Split-Path $_ -Parent } | fzf --header="Search - Git Repositories" --preview $env:FZF_CUSTOM_PREVIEW
 }
 Set-Alias -Name sg -Value Search-GitRepositories
 
-function Find-GitRepositoryFiles {
+function Find-GitRepositoryFiles
+{
   $repoRoot = "$((git rev-parse --show-toplevel) -replace '/', '\')"
   $repoFiles = fd "" $repoRoot
   $coloredFiles = $repoFiles | ForEach-Object {
@@ -111,7 +123,8 @@ function Find-GitRepositoryFiles {
 Set-Alias -Name fg -Value Find-GitRepoFiles
 Set-Alias -Name fr -Value Find-GitRepoFiles
 
-function Search-Recents {
+function Search-Recents
+{
   # Pipe null to disable the initial unnecessary search upon entering fzf
   # Sleep command is there to debounce the query so we don't search on every single letter typed
   $null | fzf --bind "change:reload-sync(Start-Sleep -m 100; es -sort date-modified-descending count:100 dm:thisweek -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9})" --phony --query "" --header="Search - Recents"
@@ -119,18 +132,20 @@ function Search-Recents {
 # Usage example: nvim (sr)
 Set-Alias -Name sr -Value Search-Recents
 
-function Search-History {
+function Search-History
+{
   $history = [Microsoft.PowerShell.PSConsoleReadLine]::GetHistoryItems() | 
-  ForEach-Object {
-    # Clean up all types of line breaks and replace with pipe
-    $_.CommandLine -replace "`r`n|`n|`r", " | "
-  } | Select-Object -Unique
+    ForEach-Object {
+      # Clean up all types of line breaks and replace with pipe
+      $_.CommandLine -replace "`r`n|`n|`r", " | "
+    } | Select-Object -Unique
 
   $buffer = $null
   [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$buffer, [ref]$null)
 
   $selected = $history | fzf --tac --query $buffer --header="Search - Command History"
-  if ($selected) {
+  if ($selected)
+  {
     $cleanCommand = $selected -replace " \| ", "`n"
     [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
     [Microsoft.PowerShell.PSConsoleReadLine]::Insert($cleanCommand)
