@@ -103,7 +103,7 @@ $neovimCodeLineOpener = @{
 
 function Search-GitRepositories
 {
-  es -p !'.*\`$Recycle.Bin' -r !'RECYCLE' -r !'^C:\\Program' -r !'C:\\Windows' -r child:^\.git$ | fzf --header="Search - Git Repositories" --preview $env:FZF_CUSTOM_PREVIEW
+  es -p -r !'.*\`$Recycle.Bin' -r !'RECYCLE' -r !'^C:\\Program' -r !'C:\\Windows' -r child:^\.git$ | fzf --header="Search - Git Repositories" --preview $env:FZF_CUSTOM_PREVIEW
 }
 Set-Alias -Name sg -Value Search-GitRepositories
 
