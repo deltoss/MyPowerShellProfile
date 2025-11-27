@@ -103,6 +103,12 @@ function Suggest-Commit-Message-Aichat
     $prompt += $diff
   }
 
+  if (-not $prompt)
+  {
+    Write-Host "No selection made..."
+    return
+  }
+
   $prompt += [Environment]::NewLine + "... Now give me the final commit message. Make it short and sweet, with at most 80 characters for the main message, and at most a few lines for the description."
 
   & aichat --session $SessionName $prompt
