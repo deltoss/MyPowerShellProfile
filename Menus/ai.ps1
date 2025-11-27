@@ -1,69 +1,87 @@
-function Prompt-RoleOption {
+function Prompt-RoleOption
+{
   $role = aichat --list-roles | fzf --header "Roles"
-  if ($role) {
+  if ($role)
+  {
     return @("--role", $role)
-  } else {
+  } else
+  {
     return @()
   }
 }
 
-function Prompt-ModelOption {
+function Prompt-ModelOption
+{
   $model = aichat --list-models | fzf --header "Models"
-  if ($model) {
+  if ($model)
+  {
     return @("--model", $model)
-  } else {
+  } else
+  {
     return @()
   }
 }
 
-function Invoke-Aichat {
-  if ($args.Count -eq 0 -or ($args.Count -eq 1 -and $args[0] -is [string] -and -not $args[0].StartsWith('-'))) {
+function Invoke-Aichat
+{
+  if ($args.Count -eq 0 -or ($args.Count -eq 1 -and $args[0] -is [string] -and -not $args[0].StartsWith('-')))
+  {
     $promptArgs = @()
     $promptArgs += Prompt-ModelOption
     $promptArgs += Prompt-RoleOption
-    if ($args.Count -eq 0) {
+    if ($args.Count -eq 0)
+    {
       & aichat --session @promptArgs
-    } else {
+    } else
+    {
       & aichat @promptArgs @args
     }
-  } else {
+  } else
+  {
     & aichat @args
   }
 }
 Set-Alias -Name ai -Value Invoke-Aichat
 
-function Invoke-Aichat-Execute {
+function Invoke-Aichat-Execute
+{
   $promptArgs = Prompt-ModelOption
   & aichat @promptArgs --execute @args
 }
 Set-Alias -Name aie -Value Invoke-Aichat-Execute
 
-function Invoke-Aichat-Code {
+function Invoke-Aichat-Code
+{
   $promptArgs = Prompt-ModelOption
   & aichat @promptArgs --code @args
 }
 Set-Alias -Name aic -Value Invoke-Aichat-Code
 
-function Invoke-Aichat-Sessions {
+function Invoke-Aichat-Sessions
+{
   & aichat --session (aichat --list-sessions | fzf --header "Sessions") @args
 }
 Set-Alias -Name ais -Value Invoke-Aichat-Sessions
 
-function Invoke-Aichat-Rags {
+function Invoke-Aichat-Rags
+{
   & aichat --rag (aichat --list-rags | fzf --header "RAGs") @args
 }
 Set-Alias -Name air -Value Invoke-Aichat-Rags
 
-function Invoke-Aichat-Macros {
+function Invoke-Aichat-Macros
+{
   & aichat --macro (aichat --list-macros | fzf --header "Macros") @args
 }
 Set-Alias -Name aim -Value Invoke-Aichat-Macros
 
-function Review-Structure-Aichat {
+function Review-Structure-Aichat
+{
   & eza --recurse --tree --git-ignore | aichat --model (aichat --list-models | fzf --header "Models") "Analyze this project structure and suggest improvements in the context of software development."
 }
 
-function Review-Changes-Aichat {
+function Review-Changes-Aichat
+{
   param(
     [string]$SessionName = "code-review-$(Get-Date -Format 'yyyy-MM-dd-HHmm')"
   )
@@ -76,9 +94,11 @@ function Review-Changes-Aichat {
         3. Does it follow the existing code patterns and style?"
 
   aichat -s $SessionName $initialPrompt
-  git diff --name-only | fzf -m --header "Select multiple with [TAB] and [SHIFT-TAB]" | ForEach-Object {
-    $file = $_
-    $diff = git diff $file
+  git status --porcelain | fzf -m --header "Select multiple with [TAB] and [SHIFT-TAB]" | ForEach-Object {
+    $line = $_
+    # Extract filename by removing the first 3 characters (status code + space)
+    $file = $line.Substring(3)
+    $diff = git --no-pager diff --no-color --no-ext-diff HEAD -- $file
 
     $prompt = "Here's the git diff for this file:" + [Environment]::NewLine
     $prompt += $diff
@@ -87,7 +107,8 @@ function Review-Changes-Aichat {
   }
 }
 
-function Explain-Code-Aichat {
+function Explain-Code-Aichat
+{
   param(
     [string]$SessionName = "code-explain-$(Get-Date -Format 'yyyy-MM-dd-HHmm')"
   )
@@ -97,19 +118,21 @@ function Explain-Code-Aichat {
   $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
 
   $result = fzf --ansi --disabled --query "" `
-  --bind "start:reload-sync:$RG_PREFIX {q}" `
-  --bind "change:reload-sync:$RG_PREFIX {q}" `
-  --delimiter ":" `
-  --preview "bat --color=always {1} --highlight-line {2}" `
-  --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
-  --header "Open in Neovim"
+    --bind "start:reload-sync:$RG_PREFIX {q}" `
+    --bind "change:reload-sync:$RG_PREFIX {q}" `
+    --delimiter ":" `
+    --preview "bat --color=always {1} --highlight-line {2}" `
+    --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
+    --header "Open in Neovim"
 
-  if ($result) {
+  if ($result)
+  {
     $parts = $result -split ':'
     $file = $parts[0]
     $line = $parts[1]
 
-    if ($file -and $line) {
+    if ($file -and $line)
+    {
       & aichat --session $SessionName --file $file "Explain the code in line $line of the file I just gave you"
     }
   }
