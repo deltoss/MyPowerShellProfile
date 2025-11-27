@@ -80,6 +80,34 @@ function Review-Structure-Aichat
   & eza --recurse --tree --git-ignore | aichat --model (aichat --list-models | fzf --header "Models") "Analyze this project structure and suggest improvements in the context of software development."
 }
 
+function Suggest-Commit-Message-Aichat
+{
+  param(
+    [string]$SessionName = "code-suggest-commit-message-$(Get-Date -Format 'yyyy-MM-dd-HHmm')"
+  )
+
+  Write-Host "Session name: $SessionName"
+
+  $initialPrompt += "I will give you the git diffs, then I will ask you to generate me a short, concise & relevant commit message."
+
+  aichat -s $SessionName $initialPrompt
+
+  $prompt = ""
+  git status --porcelain | fzf -m --header "Select multiple with [TAB] and [SHIFT-TAB]" | ForEach-Object {
+    $line = $_
+    # Extract filename by removing the first 3 characters (status code + space)
+    $file = $line.Substring(3)
+    $diff = git --no-pager diff --no-color --no-ext-diff HEAD -- $file
+
+    $prompt += "Here's the git diff for the file '$file':" + [Environment]::NewLine
+    $prompt += $diff
+  }
+
+  $prompt += [Environment]::NewLine + "... Now give me the final commit message. Make it short and sweet, with at most 80 characters for the main message, and at most a few lines for the description."
+
+  & aichat --session $SessionName $prompt
+}
+
 function Review-Changes-Aichat
 {
   param(
@@ -192,6 +220,14 @@ $global:WhichABindings = @(
     Desc = 'Continue From Existing [S]ession'
     Action = {
       [Microsoft.PowerShell.PSConsoleReadLine]::Insert('ais')
+      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+  },
+  @{
+    Key = 'M'
+    Desc = 'Suggest Commit [M]essage'
+    Action = {
+      [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Suggest-Commit-Message-Aichat')
       [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
   },
