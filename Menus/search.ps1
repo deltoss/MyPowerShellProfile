@@ -19,7 +19,7 @@ function Search-Query
     $Query
   )
 
-  $esTemplate = "es -sort date-modified-descending count:100 -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9}"
+  $esTemplate = "es count:100 -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9}"
   if ($Query)
   {
     $queryString = $Query -join ' '
@@ -127,7 +127,7 @@ function Search-Recents
 {
   # Pipe null to disable the initial unnecessary search upon entering fzf
   # Sleep command is there to debounce the query so we don't search on every single letter typed
-  $null | fzf --bind "change:reload-sync(Start-Sleep -m 100; es -sort date-modified-descending count:100 dm:thisweek -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9})" --phony --query "" --header="Search - Recents"
+  $null | fzf --bind "change:reload-sync(Start-Sleep -m 100; es count:100 dm:thisweek -p -r {q:1} -r {q:2} -r {q:3} -r {q:4} -r {q:5} -r {q:6} -r {q:7} -r {q:8} -r {q:9})" --phony --query "" --header="Search - Recents"
 }
 # Usage example: nvim (sr)
 Set-Alias -Name sr -Value Search-Recents
