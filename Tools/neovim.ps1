@@ -1,8 +1,12 @@
+Set-Alias -Name v -Value nvim
+Set-Alias -Name vim -Value nvim
+
 # Use Neovim to edit the Shell console
 Set-PSReadLineKeyHandler -Key Ctrl+o -ScriptBlock {
   $tempFile = [System.IO.Path]::GetTempFileName() + ".ps1" # The temp file extension is for Neovim's syntax highlighting
 
-  try {
+  try
+  {
     # Get current command from console to feed to Neovim via a temp file
     $line = $null
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$null)
@@ -14,11 +18,11 @@ Set-PSReadLineKeyHandler -Key Ctrl+o -ScriptBlock {
 
     [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
     [Microsoft.PowerShell.PSConsoleReadLine]::Insert($newCommand)
-  }
-  catch {
+  } catch
+  {
     Write-Host "Error: $($_.Exception.Message)"
-  }
-  finally {
+  } finally
+  {
     Remove-Item $tempFile
   }
 }
