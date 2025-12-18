@@ -3,8 +3,6 @@ $scriptDir = $PSScriptRoot
 Import-Module "$scriptDir/Modules/WhichMenu"
 Import-Module "$scriptDir/Modules/RandomCliTip"
 
-Get-RandomFavoriteCli
-
 . "$scriptDir/environments.ps1"
 
 Get-ChildItem -Path "$scriptDir/Tools/*.ps1" | ForEach-Object { . $_.FullName }
