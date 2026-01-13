@@ -4,6 +4,7 @@ if (-not $commandExists)
   return
 }
 
+# See: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html#cli-command-completion-windows
 Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
   param($commandName, $wordToComplete, $cursorPosition)
   $env:COMP_LINE=$wordToComplete
