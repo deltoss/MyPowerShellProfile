@@ -182,14 +182,14 @@ $global:WhichSBindings = @(
   }
   @{
     Key = 'n'
-    Desc = '.[N]et Solutions'
-    Action = { Search-DotNetSolutions }
-  },
-  @{
-    Key = 'o'
-    Desc = '[O]bsidian Notes'
+    Desc = '[N]otes'
     Action = { Search-ObsidianNotes }
     Openers = $global:Openers.All
+  },
+  @{
+    Key = 'N'
+    Desc = '.[N]et Solutions'
+    Action = { Search-DotNetSolutions }
   },
   @{
     Key = 'g'
