@@ -1,10 +1,3 @@
-# Configure Yazi to open files correctly on Windows.
-# See:
-#   https://yazi-rs.github.io/docs/installation#windows
-$env:YAZI_FILE_ONE = "C:\Program Files\Git\usr\bin\file.exe"
-
-Set-EnvVarIfNotSet -Name 'YAZI_CONFIG_HOME' -Value "$env:XDG_CONFIG_HOME/yazi"
-
 # Yazi File Manager
 # Based on:
 #   https://yazi-rs.github.io/docs/quick-start#shell-wrapper
