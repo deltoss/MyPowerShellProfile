@@ -1,4 +1,4 @@
-# Adds devenv to the path, so you can use:
+# Sample usage:
 #   devenv MySolution.sln
 #   devenv MySolution.sln /build "Debug|Any CPU"
 #   devenv MySolution.sln /rebuild "Release|x64"
@@ -14,6 +14,6 @@ function devenv
     & $devenvPath @args
   } else
   {
-    Write-Debug "No Visual Studio installation found"
+    Write-Error "No Visual Studio installation found"
   }
 }
