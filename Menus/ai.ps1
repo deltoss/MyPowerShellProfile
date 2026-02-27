@@ -141,37 +141,6 @@ function Review-Changes-Aichat
   }
 }
 
-function Explain-Code-Aichat
-{
-  param(
-    [string]$SessionName = "code-explain-$(Get-Date -Format 'yyyy-MM-dd-HHmm')"
-  )
-
-  echo "Session name: $SessionName"
-
-  $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case"
-
-  $result = fzf --ansi --disabled --query "" `
-    --bind "start:reload-sync:$RG_PREFIX {q}" `
-    --bind "change:reload-sync:$RG_PREFIX {q}" `
-    --delimiter ":" `
-    --preview "bat --color=always {1} --highlight-line {2}" `
-    --preview-window "up,60%,border-bottom,+{2}+3/3,~3" `
-    --header "Open in Neovim"
-
-  if ($result)
-  {
-    $parts = $result -split ':'
-    $file = $parts[0]
-    $line = $parts[1]
-
-    if ($file -and $line)
-    {
-      & aichat --session $SessionName --file $file "Explain the code in line $line of the file I just gave you"
-    }
-  }
-}
-
 $global:WhichABindings = @(
   @{
     Key = 'l'
@@ -250,14 +219,6 @@ $global:WhichABindings = @(
     Desc = 'Review Code [C]hanges'
     Action = {
       [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Review-Changes-Aichat')
-      [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    }
-  },
-  @{
-    Key = 'E'
-    Desc = '[E]xplain Code'
-    Action = {
-      [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Explain-Code-Aichat')
       [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
   }

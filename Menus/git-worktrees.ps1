@@ -7,49 +7,6 @@ function Get-MainRepoFolder
   return Split-Path $gitCommonDir -Parent
 }
 
-function Parse-GitUrl {
-  param(
-    [Parameter(Mandatory=$true)]
-    [string]$Url
-  )
-
-  $result = @{
-    Protocol = $null
-    Host = $null
-    Path = $null
-    Owner = $null
-    Repository = $null
-    FullUrl = $Url
-  }
-
-  # Handle SSH format (git@host:path)
-  if ($Url -match '^git@([^:]+):(.+)$') {
-    $result.Protocol = 'ssh'
-    $result.Host = $Matches[1]
-    $result.Path = $Matches[2] -replace '\.git$', ''
-  }
-  # Handle standard HTTP/HTTPS URLs
-  elseif ($Url -match '^(\w+)://([^/]+)/(.+)$') {
-    $result.Protocol = $Matches[1]
-    $result.Host = $Matches[2]
-    $result.Path = $Matches[3] -replace '\.git$', ''
-  }
-  else {
-    Write-Warning "Could not parse Git URL: $Url"
-    return $null
-  }
-
-  # Extract owner and repo from path
-  $pathParts = $result.Path -split '/'
-  if ($pathParts.Count -ge 2) {
-    $result.Repository = $pathParts[-1]
-    # Everything except the last part is the owner (handles org/user or just user)
-    $result.Owner = ($pathParts[0..($pathParts.Count - 2)] -join '/')
-  }
-
-  return [PSCustomObject]$result
-}
-
 function Get-WorktreesFolder
 {
   $worktreeFolder = "$(Get-MainRepoFolder).worktrees/"
@@ -126,9 +83,8 @@ function Select-WorktreeWithFzf
 
   # fzf only gives us the selected string back
   # Get the original worktree object from the selection
-  $selectedWorktree = $worktrees | Where-Object {
-    $_.Branch -eq ($selected -replace '\s+\(.+\)\s+.+').Trim()
-  }
+  let selected_branch = $selected | str replace --regex '\s+.+\s+.+' '' | str trim
+  let selected_worktree = $worktrees | where branch == $selected_branch
 
   return $selectedWorktree
 }
